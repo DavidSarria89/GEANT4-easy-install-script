@@ -4,7 +4,8 @@ set -e
 #################
 mkdir -p geant4 # directory were everything is built and installed
 cd geant4
-############# 
+base_dir=$PWD
+#############
 
 ########################## VARIABLES
 
@@ -13,8 +14,10 @@ cd geant4
 matio_git_repo=https://github.com/tbeu/matio.git
 
 hdf5_git_repo=https://git.hdfgroup.org/scm/hdffv/hdf5.git
-hdf5_src_foldername=hdf5_1_10_1
-hdf5_branch=hdf5_1_10_1
+hdf5_ar=hdf5-1_10_1.tar.gz
+hdf5_ar_url=https://github.com/live-clones/hdf5/archive/$hdf5_ar
+hdf5_src_foldername=hdf5-hdf5-1_10_1
+hdf5_branch=hdf5_1_10
 
 zlib_src=zlib-1.2.11
 zlib_ar_name=$zlib_src.tar.gz
@@ -30,8 +33,6 @@ current_dir=$PWD
 
 # Parameters
 core_nb=`grep -c ^processor /proc/cpuinfo`
-
-base_dir=$PWD
 
 # MATIO
 
@@ -52,11 +53,11 @@ zlib_install_dir=($base_dir/install_zlib/)
 
 ########## Creating folders
 
-  mkdir -p $matio_build_dir
-  mkdir -p $matio_install_dir
+mkdir -p $matio_build_dir
+mkdir -p $matio_install_dir
 
-  mkdir -p $hdf5_build_dir
-  mkdir -p $hdf5_install_dir
+mkdir -p $hdf5_build_dir
+mkdir -p $hdf5_install_dir
 
 #### ZLIB (requirement of MATIO and HDF5)
 
@@ -66,9 +67,10 @@ wget -N $zlib_url
 tar zxf $zlib_ar_name
 cd $zlib_src
 CC=gcc CXX=g++ ./configure --prefix=$zlib_install_dir \
-                           --eprefix=$zlib_install_dir
+--eprefix=$zlib_install_dir
 make
 make install
+cd $base_dir
 echo "... done"
 
 #### HDF5 (requirement of MATIO)
@@ -77,19 +79,20 @@ echo "Attempt to download HDF5 source..."
 
 rm -rf $hdf5_src_foldername
 
-git clone --branch $hdf5_branch $hdf5_git_repo $hdf5_src_foldername
+wget -N $hdf5_ar_url
+tar zxf $hdf5_ar
 
-cd $hdf5_src_foldername  
+cd $hdf5_src_foldername
 
 echo "... done"
 
 echo "Attempt to configure Autotools of HDF5..."
 CC=gcc CXX=g++ ./configure --with-zlib=$zlib_install_dir \
-                           --enable-cxx --enable-fortran \
-                           --quiet --enable-shared --enable-build-mode=debug --disable-deprecated-symbols \
-                           --disable-hl --disable-strict-format-checks --disable-memory-alloc-sanity-check \
-                           --disable-instrument --disable-parallel --disable-trace --disable-internal-debug \
-                           --enable-optimization=debug --disable-asserts --with-pic --with-default-api-version=v110 CFLAGS="-w"
+--enable-cxx --enable-fortran \
+--quiet --enable-shared --enable-build-mode=debug --disable-deprecated-symbols \
+--disable-hl --disable-strict-format-checks --disable-memory-alloc-sanity-check \
+--disable-instrument --disable-parallel --disable-trace --disable-internal-debug \
+--enable-optimization=debug --disable-asserts --with-pic --with-default-api-version=v110 CFLAGS="-w"
 
 echo "... done"
 
@@ -122,12 +125,12 @@ git reset --hard adfa218770183cf93f74e7fad5055921ae1f9958 # specific commit wher
 echo "build of matio: Attempt to execute Autotools..."
 
 CC=gcc CXX=g++ ./configure --with-default-file-ver=7.3 \
-                           --with-hdf5=${hdf5_install_dir} \
-                           --prefix=$matio_install_dir \
-                           --with-default-api-version=v110 \
-                           --enable-mat73=yes \
-                           --with-zlib=$zlib_install_dir \
-                           --exec-prefix=$matio_install_dir
+--with-hdf5=${hdf5_install_dir} \
+--prefix=$matio_install_dir \
+--with-default-api-version=v110 \
+--enable-mat73=yes \
+--with-zlib=$zlib_install_dir \
+--exec-prefix=$matio_install_dir
 
 echo "... done"
 
@@ -150,21 +153,36 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 NC='\033[0m'
 
-echo "## --> Added by Geant4 installation script" >> ~/.bashrc
+# clean environement that was previously set by this script
+first_line=`grep -n "## --> Added by hdf5 zlib matio installation script" ~/.bashrc | awk -F  ":" '{print $1}'`
+echo $first_line
+last_line=`grep -n "## <-- Added by hdf5 zlib matio installation script" ~/.bashrc | awk -F  ":" '{print $1}'`
+echo $last_line
+
+re='^[0-9]+$'
+if [[ $first_line =~ $re ]] ; then # if $first_line is a number (i.e. it was found)
+    if [[ $last_line =~ $re ]] ; then # if $last_line is a number (i.e. it was found)
+        sed -i.bak "${first_line},${last_line}d" ~/.bashrc # delete text in .bashrc from first-line to last-line
+    fi
+fi
+
+#
+
+echo "## --> Added by hdf5 zlib matio installation script" >> ~/.bashrc
 
 set_environement() {
-
-cd $base_dir
-
-  if grep -Fxq "$1" ~/.bashrc
-  then
-    echo -e "${GREEN}< source $1 > already set up in ~/.bashrc.${NC}"          
-  else
-    echo "    " >> ~/.bashrc
-    echo $1 >> ~/.bashrc
-    echo "______"
-    echo -e "${GREEN}added ${RED}$1${GREEN} to ${RED}~/.bashrc${GREEN} file.${NC}"
-  fi
+    
+    cd $base_dir
+    
+    if grep -Fxq "$1" ~/.bashrc
+    then
+        echo -e "${GREEN}< source $1 > already set up in ~/.bashrc.${NC}"
+    else
+        echo "    " >> ~/.bashrc
+        echo $1 >> ~/.bashrc
+        echo "______"
+        echo -e "${GREEN}added ${RED}$1${GREEN} to ${RED}~/.bashrc${GREEN} file.${NC}"
+    fi
 }
 
 # matio
@@ -191,7 +209,7 @@ set_environement "export LD_LIBRARY_PATH=\$LD_LIBRARY_PATH:$zlib_install_dir/lib
 set_environement "export LIBRARY_PATH=\$LIBRARY_PATH:$zlib_install_dir/lib/"
 set_environement "export PATH=\$PATH:$zlib_install_dir/include/"
 
-echo "## <-- Added by Geant4 installation script" >> ~/.bashrc
+echo "## <-- Added by hdf5 zlib matio installation script" >> ~/.bashrc
 
 echo "... Done"
 echo -e "${RED}Please excecute command < ${GREEN}source ~/.bashrc${RED} > or re-open a terminal for the system to be able to find the databases and libraries.${NC}"

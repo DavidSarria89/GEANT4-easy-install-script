@@ -4,7 +4,7 @@ set -e
 #################
 mkdir -p geant4 # directory were everything is built and installed
 cd geant4
-############# 
+#############
 
 ########################## VARIABLES
 
@@ -56,15 +56,15 @@ casmesh_install_dir=($base_dir/install_cadmesh_g4_${_g4_version}/)
 
 ########## Creating folders
 
-  mkdir -p ${build_dir} # -p will create only if it does not exist yet
-  mkdir -p ${src_dir}
-  mkdir -p ${install_dir}
+mkdir -p ${build_dir} # -p will create only if it does not exist yet
+mkdir -p ${src_dir}
+mkdir -p ${install_dir}
 
-  mkdir -p $casmesh_build_dir
-  mkdir -p $casmesh_install_dir
+mkdir -p $casmesh_build_dir
+mkdir -p $casmesh_install_dir
 
-  mkdir -p $xercesc_build_dir
-  mkdir -p $xercesc_install_dir
+mkdir -p $xercesc_build_dir
+mkdir -p $xercesc_install_dir
 
 ############# CHECK IF OS IS UBUNTU
 echo "checking if OS is Ubuntu..."
@@ -76,32 +76,32 @@ if [ -f /etc/os-release ]; then
 fi
 
 if [ ! "$OS" = "Ubuntu" ]; then
-  echo "Error: OS is not Ubuntu. Script works only for Ubuntu. Aborting."
-  exit 1
+    echo "Error: OS is not Ubuntu. Script works only for Ubuntu. Aborting."
+    exit 1
 else
-  echo "... OS is Ubuntu"
+    echo "... OS is Ubuntu"
 fi
-############# 
+#############
 
 #########################################################################
 ############# CHECK IF DEPENDENCIES ARE SATISFIED, OTHERWISE INSTALL THEM
 
-ubuntu_dependences_list=( "build-essential" 
-"qt4-default" 
-"qtcreator" 
-"cmake-qt-gui" 
-"gcc" 
-"g++" 
-"gfortran" 
-"zlib1g-dev" 
-"libxerces-c-dev" 
-"libx11-dev" 
-"libexpat1-dev" 
-"libxmu-dev" 
-"libmotif-dev" 
-"libboost-filesystem-dev" 
-"libeigen3-dev" 
-"qt4-qmake"
+ubuntu_dependences_list=( "build-essential"
+    "qt4-default"
+    "qtcreator"
+    "cmake-qt-gui"
+    "gcc"
+    "g++"
+    "gfortran"
+    "zlib1g-dev"
+    "libxerces-c-dev"
+    "libx11-dev"
+    "libexpat1-dev"
+    "libxmu-dev"
+    "libmotif-dev"
+    "libboost-filesystem-dev"
+    "libeigen3-dev"
+    "qt4-qmake"
 )
 
 entered_one_time=true
@@ -109,27 +109,27 @@ entered_one_time=true
 run_install()
 {
     echo "Some missing dependencies were detected."
-    ## Prompt the user 
+    ## Prompt the user
     if [ entered_one_time=true ]; then
-      entered_one_time=false
-      read -p "Do you have (root) sudo access ? [Y/n]. It is required to install missing dependencies: " answer
-      ## Set the default value if no answer was given
-      answer=${answer:N}
-      if [[ $answer =~ [Nn] ]]; then
-        echo "root access is required to install missing dependencies. Aborting."
-        exit 1
-      fi
+        entered_one_time=false
+        read -p "Do you have (root) sudo access ? [Y/n]. It is required to install missing dependencies: " answer
+        ## Set the default value if no answer was given
+        answer=${answer:N}
+        if [[ $answer =~ [Nn] ]]; then
+            echo "root access is required to install missing dependencies. Aborting."
+            exit 1
+        fi
     fi
-    ## Prompt the user 
+    ## Prompt the user
     read -p "Do you want to install missing dependencies? [Y/n]: " answer
     ## Set the default value if no answer was given
     answer=${answer:Y}
     ## If the answer matches y or Y, install
     if [[ $answer =~ [Yy] ]]; then
-      sudo apt-get install ${ubuntu_dependences_list[@]}
+        sudo apt-get install ${ubuntu_dependences_list[@]}
     else
-      echo "Missing dependencies are required for proper compilation and installation. Aborting."
-      exit 0
+        echo "Missing dependencies are required for proper compilation and installation. Aborting."
+        exit 0
     fi
 }
 
@@ -162,16 +162,16 @@ echo "build of xerces-c: Attempt to execute CMake..."
 rm -rf CMakeCache.txt
 
 $CMake_path \
-      -DCMAKE_INSTALL_PREFIX=${xercesc_install_dir} \
-      -DCMAKE_BUILD_TYPE=Release \
-      -DCMAKE_INSTALL_LIBDIR=lib64 \
-      $xerces_src
+-DCMAKE_INSTALL_PREFIX=${xercesc_install_dir} \
+-DCMAKE_BUILD_TYPE=Release \
+-DCMAKE_INSTALL_LIBDIR=lib64 \
+$xerces_src
 echo "... done"
 
 echo "Attempt to compile and install xerces-c"
 
-  G4VERBOSE=1 make -j${core_nb}
-  make install
+G4VERBOSE=1 make -j${core_nb}
+make install
 
 cd $base_dir
 echo "... done"
@@ -188,40 +188,40 @@ rm -rf geant4.${_g4_version}.tar.gz
 
 ## compile and install Geant4
 
-  cd ${build_dir}
-  rm -rf CMakeCache.txt
+cd ${build_dir}
+rm -rf CMakeCache.txt
 
 echo "build_geant4: Attempt to execute CMake"
-  
-      $CMake_path \
-      -DCMAKE_INSTALL_PREFIX=${install_dir} \
-      -DCMAKE_BUILD_TYPE=Release \
-      -DGEANT4_BUILD_MULTITHREADED=OFF \
-      -DGEANT4_BUILD_CXXSTD=c++11 \
-      -DGEANT4_INSTALL_DATA=ON \
-      -DGEANT4_USE_GDML=ON \
-      -DGEANT4_USE_G3TOG4=ON \
-      -DGEANT4_USE_QT=ON \
-      -DGEANT4_FORCE_QT4=ON \
-      -DGEANT4_USE_XM=ON \
-      -DGEANT4_USE_OPENGL_X11=ON \
-      -DGEANT4_USE_INVENTOR=OFF \
-      -DGEANT4_USE_RAYTRACER_X11=ON \
-      -DGEANT4_USE_SYSTEM_CLHEP=OFF \
-      -DGEANT4_USE_SYSTEM_EXPAT=OFF \
-      -DGEANT4_USE_SYSTEM_ZLIB=OFF \
-      -DCMAKE_INSTALL_LIBDIR=lib \
-      -DXERCESC_INCLUDE_DIR=${xercesc_inc_dir} \
-      -DXERCESC_LIBRARY=${xercesc_lib_dir} \
-      ../source_geant4.${_g4_version}/
+
+$CMake_path \
+-DCMAKE_INSTALL_PREFIX=${install_dir} \
+-DCMAKE_BUILD_TYPE=Release \
+-DGEANT4_BUILD_MULTITHREADED=OFF \
+-DGEANT4_BUILD_CXXSTD=c++11 \
+-DGEANT4_INSTALL_DATA=ON \
+-DGEANT4_USE_GDML=ON \
+-DGEANT4_USE_G3TOG4=ON \
+-DGEANT4_USE_QT=ON \
+-DGEANT4_FORCE_QT4=ON \
+-DGEANT4_USE_XM=ON \
+-DGEANT4_USE_OPENGL_X11=ON \
+-DGEANT4_USE_INVENTOR=OFF \
+-DGEANT4_USE_RAYTRACER_X11=ON \
+-DGEANT4_USE_SYSTEM_CLHEP=OFF \
+-DGEANT4_USE_SYSTEM_EXPAT=OFF \
+-DGEANT4_USE_SYSTEM_ZLIB=OFF \
+-DCMAKE_INSTALL_LIBDIR=lib \
+-DXERCESC_INCLUDE_DIR=${xercesc_inc_dir} \
+-DXERCESC_LIBRARY=${xercesc_lib_dir} \
+../source_geant4.${_g4_version}/
 
 echo "... Done"
 
 echo "Attempt to compile and install Geant4"
 
-  G4VERBOSE=1 make -j${core_nb}
+G4VERBOSE=1 make -j${core_nb}
 
-  make install
+make install
 
 cd $base_dir
 echo "... Done"
@@ -247,22 +247,23 @@ echo "build of CADMESH: Attempt to execute CMake..."
 rm -rf CMakeCache.txt
 
 $CMake_path \
-      -DCMAKE_INSTALL_PREFIX=${casmesh_install_dir} \
-      -DCMAKE_BUILD_TYPE=Release \
-      -DCMAKE_INSTALL_LIBDIR=lib \
-      -DGeant4_DIR=$geant4_lib_dir \
-      $casmesh_src
+-DCMAKE_INSTALL_PREFIX=${casmesh_install_dir} \
+-DCMAKE_BUILD_TYPE=Release \
+-DCMAKE_INSTALL_LIBDIR=lib \
+-DGeant4_DIR=$geant4_lib_dir \
+$casmesh_src
 
 echo "... done"
 
 echo "Attempt to compile and install CADMESH"
 
-  G4VERBOSE=1 make -j${core_nb}
-  make install
+G4VERBOSE=1 make -j${core_nb}
+make install
 
 cd $base_dir
 
 echo "... done"
+
 
 
 #########################################################################
@@ -275,45 +276,58 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 NC='\033[0m'
 
+# clean environement that was previously set by this script
+first_line=`grep -n "## --> Added by Geant4 installation script" ~/.bashrc | awk -F  ":" '{print $1}'`
+echo $first_line
+last_line=`grep -n "## <-- Added by Geant4 installation script" ~/.bashrc | awk -F  ":" '{print $1}'`
+echo $last_line
+
+re='^[0-9]+$'
+if [[ $first_line =~ $re ]] ; then # if $first_line is a number (i.e. it was found)
+    if [[ $last_line =~ $re ]] ; then # if $last_line is a number (i.e. it was found)
+        sed -i.bak "${first_line},${last_line}d" ~/.bashrc # delete text in .bashrc from first-line to last-line
+    fi
+fi
+
+#
 echo "## --> Added by Geant4 installation script" >> ~/.bashrc
 
 set_environement() {
-
-cd $base_dir
-
-  if grep -Fxq "$1" ~/.bashrc
-  then
-    echo -e "${GREEN}< source $1 > already set up in ~/.bashrc.${NC}"          
-  else
-    echo "    " >> ~/.bashrc
-    echo $1 >> ~/.bashrc
-    echo "______"
-    echo -e "${GREEN}added ${RED}$1${GREEN} to ${RED}~/.bashrc${GREEN} file.${NC}"
-  fi
+    
+    cd ${base_dir}
+    
+    if grep -Fxq "$1" ~/.bashrc
+    then
+        echo -e "${GREEN}< source $1 > already set up in ~/.bashrc.${NC}"
+    else
+        echo "    " >> ~/.bashrc
+        echo $1 >> ~/.bashrc
+        echo "______"
+        echo -e "${GREEN}added ${RED}$1${GREEN} to ${RED}~/.bashrc${GREEN} file.${NC}"
+    fi
 }
 
 # Geant4 + data
-set_environement "source $install_dir/bin/geant4.sh"
+set_environement "source ${install_dir}/bin/geant4.sh"
 
 # CADMesh
-set_environement "export cadmesh_DIR=$casmesh_install_dir/lib/cmake/cadmesh-1.1.0/"
-set_environement "export C_INCLUDE_PATH=\$C_INCLUDE_PATH:$casmesh_install_dir/include/"
-set_environement "export CPLUS_INCLUDE_PATH=\$CPLUS_INCLUDE_PATH:$casmesh_install_dir/include/"
-set_environement "export PATH=\$PATH:$casmesh_install_dir/include/"
-set_environement "export LIBRARY_PATH=\$LIBRARY_PATH:$casmesh_install_dir/lib/"
-set_environement "export LD_LIBRARY_PATH=\$LD_LIBRARY_PATH:$casmesh_install_dir/lib/"
+set_environement "export cadmesh_DIR=${casmesh_install_dir}/lib/cmake/cadmesh-1.1.0/"
+set_environement "export C_INCLUDE_PATH=\$C_INCLUDE_PATH:${casmesh_install_dir}/include/"
+set_environement "export CPLUS_INCLUDE_PATH=\$CPLUS_INCLUDE_PATH:${casmesh_install_dir}/include/"
+set_environement "export PATH=\$PATH:${casmesh_install_dir}/include/"
+set_environement "export LIBRARY_PATH=\$LIBRARY_PATH:${casmesh_install_dir}/lib/"
+set_environement "export LD_LIBRARY_PATH=\$LD_LIBRARY_PATH:${casmesh_install_dir}/lib/"
 
 # xerces-c
-set_environement "export C_INCLUDE_PATH=\$C_INCLUDE_PATH:$xercesc_install_dir/include/"
-set_environement "export CPLUS_INCLUDE_PATH=\$CPLUS_INCLUDE_PATH:$xercesc_install_dir/include/"
-set_environement "export LD_LIBRARY_PATH=\$LD_LIBRARY_PATH:$xercesc_install_dir/lib64/"
-set_environement "export LIBRARY_PATH=\$LIBRARY_PATH:$xercesc_install_dir/lib64/"
-set_environement "export PATH=\$PATH:$xercesc_install_dir/include/"
+set_environement "export C_INCLUDE_PATH=\$C_INCLUDE_PATH:${xercesc_install_dir}/include/"
+set_environement "export CPLUS_INCLUDE_PATH=\$CPLUS_INCLUDE_PATH:${xercesc_install_dir}/include/"
+set_environement "export LD_LIBRARY_PATH=\$LD_LIBRARY_PATH:${xercesc_install_dir}/lib64/"
+set_environement "export LIBRARY_PATH=\$LIBRARY_PATH:${xercesc_install_dir}/lib64/"
+set_environement "export PATH=\$PATH:${xercesc_install_dir}/include/"
 
+echo " " >> ~/.bashrc
 echo "## <-- Added by Geant4 installation script" >> ~/.bashrc
-
 echo "... Done"
 echo -e "${RED}Please excecute command < ${GREEN}source ~/.bashrc${RED} > or re-open a terminal for the system to be able to find the databases and libraries.${NC}"
-
 
 
