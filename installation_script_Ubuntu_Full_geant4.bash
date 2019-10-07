@@ -9,6 +9,9 @@ cd geant4
 ########################## VARIABLES
 
 ##############  PROGRAMS' VERSIONS AND URLs : MAY CHANGE IN THE FUTURE
+
+cmake_download_url=https://github.com/Kitware/CMake/releases/download/v3.14.3/cmake-3.14.3-Linux-x86_64.tar.gz
+
 g4_version=10.4.p03
 _g4_version=10.04.p03
 folder_g4_version=Geant4-10.4.3
@@ -23,8 +26,18 @@ casmesh_arc=v${casmesh_w_ver}.tar.gz
 casmesh_url=("https://github.com/christopherpoole/CADMesh/archive/v$casmesh_w_ver.tar.gz")
 ####################################################
 
+# getting CMake
+rm -rf cmake
+rm -rf cmake-3.14.3-Linux-x86_64
+rm -rf cmake-3.14.3-Linux-x86_64.tar.gz
+wget ${cmake_download_url}
+tar zxf cmake-3.14.3-Linux-x86_64.tar.gz
+mv cmake-3.14.3-Linux-x86_64 cmake
+rm -rf cmake-3.14.3-Linux-x86_64.tar.gz
+
 # CMake command
-CMake_path=../../cmake/bin/cmake
+base_dir=${PWD}
+CMake_path=${base_dir}/cmake/bin/cmake
 
 #
 current_dir=$PWD
@@ -32,7 +45,7 @@ current_dir=$PWD
 # Parameters
 core_nb=`grep -c ^processor /proc/cpuinfo`
 
-base_dir=$PWD
+
 
 # Geant4
 src_dir=$base_dir/source_geant4.${_g4_version}/

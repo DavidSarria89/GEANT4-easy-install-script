@@ -11,6 +11,8 @@ base_dir=$PWD
 
 ##############  PROGRAMS' VERSIONS AND URLs : MAY CHANGE IN THE FUTURE
 
+cmake_download_url=https://github.com/Kitware/CMake/releases/download/v3.14.3/cmake-3.14.3-Linux-x86_64.tar.gz
+
 matio_git_repo=https://github.com/tbeu/matio.git
 
 hdf5_git_repo=https://git.hdfgroup.org/scm/hdffv/hdf5.git
@@ -25,8 +27,17 @@ zlib_url=https://www.zlib.net/$zlib_ar_name
 
 ####################################################
 
+# getting CMake
+rm -rf cmake
+rm -rf cmake-3.14.3-Linux-x86_64
+rm -rf cmake-3.14.3-Linux-x86_64.tar.gz
+wget ${cmake_download_url}
+tar zxf cmake-3.14.3-Linux-x86_64.tar.gz
+mv cmake-3.14.3-Linux-x86_64 cmake
+rm -rf cmake-3.14.3-Linux-x86_64.tar.gz
+
 # CMake command
-CMake_path=../../cmake/bin/cmake
+CMake_path=${base_dir}/cmake/bin/cmake
 
 #
 current_dir=$PWD
