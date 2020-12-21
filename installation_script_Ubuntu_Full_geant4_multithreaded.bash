@@ -16,13 +16,13 @@ g4_url=("http://cern.ch/geant4-data/releases/geant4.${_g4_version}.tar.gz")
 
 cmake_download_url=https://github.com/Kitware/CMake/releases/download/v3.14.3/cmake-3.14.3-Linux-x86_64.tar.gz
 
-xerces_w_ver=xerces-c-3.2.0
+xerces_w_ver=xerces-c-3.2.2
 xerces_arc=${xerces_w_ver}.tar.gz
 xerces_url=("http://archive.apache.org/dist/xerces/c/3/sources/$xerces_arc")
 
 casmesh_w_ver=1.1
 casmesh_arc=v${casmesh_w_ver}.tar.gz
-casmesh_url=("https://github.com/christopherpoole/CADMesh/archive/v$casmesh_w_ver.tar.gz")
+casmesh_url=("https://github.com/DavidSarria89/CADMesh/releases/download/v1.1mod/v1.1.tar.gz")
 ####################################################
 
 # getting CMake
@@ -112,6 +112,9 @@ ubuntu_dependences_list=( "build-essential"
     "libboost-filesystem-dev"
     "libeigen3-dev"
     "qt4-qmake"
+    "libuuid1"
+    "uuid-dev"
+    "uuid-runtime"
 )
 
 entered_one_time=true
@@ -204,6 +207,7 @@ rm -rf CMakeCache.txt
 echo "build_geant4: Attempt to execute CMake"
 
 $CMake_path \
+-DCMAKE_PREFIX_PATH=${xercesc_install_dir} \
 -DCMAKE_INSTALL_PREFIX=${install_dir} \
 -DCMAKE_BUILD_TYPE=Release \
 -DGEANT4_BUILD_MULTITHREADED=ON \
@@ -246,7 +250,7 @@ wget $casmesh_url
 tar zxf $base_dir/$casmesh_arc
 rm -rf $casmesh_arc
 
-casmesh_src=$base_dir/CADMesh-$casmesh_w_ver
+casmesh_src=$base_dir/CADMesh-master
 
 ## compile and install CADMESH
 

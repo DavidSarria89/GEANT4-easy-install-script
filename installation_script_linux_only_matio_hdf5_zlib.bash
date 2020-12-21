@@ -17,7 +17,7 @@ matio_git_repo=https://github.com/tbeu/matio.git
 
 hdf5_git_repo=https://git.hdfgroup.org/scm/hdffv/hdf5.git
 hdf5_ar=hdf5-1_10_1.tar.gz
-hdf5_ar_url=https://github.com/live-clones/hdf5/archive/$hdf5_ar
+hdf5_ar_url=https://github.com/HDFGroup/hdf5/archive/hdf5-1_10_1.tar.gz
 hdf5_src_foldername=hdf5-hdf5-1_10_1
 hdf5_branch=hdf5_1_10
 

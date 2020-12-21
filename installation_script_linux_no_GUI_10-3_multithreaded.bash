@@ -9,14 +9,14 @@ cd geant4
 ########################## VARIABLES
 
 ##############  PROGRAMS' VERSIONS AND URLs : MAY CHANGE IN THE FUTURE
-g4_version=10.4.p03
-_g4_version=10.04.p03
-folder_g4_version=Geant4-10.4.3
+g4_version=10.3.p03
+_g4_version=10.03.p03
+folder_g4_version=Geant4-10.3.3
 g4_url=("http://cern.ch/geant4-data/releases/geant4.${_g4_version}.tar.gz")
 
 cmake_download_url=https://github.com/Kitware/CMake/releases/download/v3.14.3/cmake-3.14.3-Linux-x86_64.tar.gz
 
-xerces_w_ver=xerces-c-3.2.0
+xerces_w_ver=xerces-c-3.2.2
 xerces_arc=${xerces_w_ver}.tar.gz
 xerces_url=("http://archive.apache.org/dist/xerces/c/3/sources/${xerces_arc}")
 
@@ -34,11 +34,17 @@ tar zxf cmake-3.14.3-Linux-x86_64.tar.gz
 mv cmake-3.14.3-Linux-x86_64 cmake
 rm -rf cmake-3.14.3-Linux-x86_64.tar.gz
 
+#
+current_dir=${PWD}
+
 # Parameters
 core_nb=`grep -c ^processor /proc/cpuinfo`
 
-current_dir=${PWD}
 base_dir=${PWD}
+
+echo " "
+echo ${base_dir}
+echo " "
 
 # CMake command
 CMake_path=${base_dir}/cmake/bin/cmake
@@ -214,7 +220,7 @@ echo $last_line
 
 re='^[0-9]+$'
 if [[ $first_line =~ $re ]] ; then # if $first_line is a number (i.e. it was found)
-    if [[ $last_line =~ $re ]] ; then # if $last_line is a number (i.e. it was found)
+    if [[ $first_line =~ $re ]] ; then # if $last_line is a number (i.e. it was found)
         sed -i.bak "${first_line},${last_line}d" ~/.bashrc # delete text in .bashrc from first-line to last-line
     fi
 fi

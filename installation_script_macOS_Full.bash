@@ -132,6 +132,7 @@ rm -rf CMakeCache.txt
 echo "build_geant4: Attempt to execute CMake"
 
 ${CMake_path} \
+-DCMAKE_PREFIX_PATH=${xercesc_install_dir} \
 -DCMAKE_INSTALL_PREFIX=${install_dir} \
 -DCMAKE_BUILD_TYPE=Release \
 -DCMAKE_PREFIX_PATH="${xercesc_install_dir}/lib64/cmake/;/usr/local/opt/qt/lib/cmake/" \
